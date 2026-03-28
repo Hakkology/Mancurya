@@ -3,16 +3,16 @@
 
 namespace Mancurya {
 
-void Sea::init() { 
-    shader.load("../shaders/water.vert", "../shaders/water.frag"); 
+void Sea::init() {
+    shader.load("../shaders/water.vert", "../shaders/water.frag");
 }
 
-void Sea::update() { 
-    waveOffset += 0.01f; 
+void Sea::update() {
+    waveOffset += 0.01f;
 }
 
 void Sea::draw() {
-    shader.use(); 
+    shader.use();
     shader.setUniform1f("time", waveOffset * 10.0f);
     glBegin(GL_QUADS);
     for(float x=-10; x<=10; x+=0.25f) {

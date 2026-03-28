@@ -31,12 +31,25 @@ void display() {
         "Pirus Zaferi!"
     };
     glDisable(GL_LIGHTING); 
-    glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity(); glOrtho(-1, 1, -1, 1, -1, 1);
-    glMatrixMode(GL_MODELVIEW); glPushMatrix(); glLoadIdentity(); 
-    glRasterPos2f(-0.3f, 0.8f);
-    int idx = ((int)(storyTimer/3)) % 5;
-    for (const char* c = lines[idx]; *c; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    glPopMatrix(); glMatrixMode(GL_PROJECTION); glPopMatrix(); glMatrixMode(GL_MODELVIEW); 
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(-1, 1, -1, 1, -1, 1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glRasterPos2f(-0.4f, 0.85f);
+    int idx = ((int)(storyTimer / 3)) % 5;
+    for (const char* c = lines[idx]; *c; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
     glEnable(GL_LIGHTING);
 
     glutSwapBuffers();
@@ -50,24 +63,26 @@ void update(int v) {
     glutTimerFunc(16, update, 0);
 }
 
-void fire(int v) { 
-    fleets.fire(); 
-    glutTimerFunc(800, fire, 0); 
+void fire(int v) {
+    fleets.fire();
+    glutTimerFunc(800, fire, 0);
 }
 
 void init() {
     glewInit();
-    env.init(); 
-    sea.init(); 
+    env.init();
+    sea.init();
     fleets.init();
-    
-    glEnable(GL_DEPTH_TEST); 
-    glEnable(GL_LIGHTING); 
-    glEnable(GL_LIGHT0); 
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
-    GLfloat lp[] = { 1.0f, 5.0f, 5.0f, 1.0f }; 
+
+    GLfloat lp[] = {1.0f, 5.0f, 5.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_POSITION, lp);
-    glEnable(GL_BLEND); 
+
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -79,13 +94,14 @@ int main(int argc, char** argv) {
     glutCreateWindow("Mancurya 3D - Modular Architecture");
     init();
     glutDisplayFunc(display); 
-    glutReshapeFunc([](int w, int h){ 
-        glViewport(0, 0, w, h); 
-        glMatrixMode(GL_PROJECTION); glLoadIdentity(); 
-        gluPerspective(45.0, (float)w/h, 0.1, 100.0); 
-        glMatrixMode(GL_MODELVIEW); 
+    glutReshapeFunc([](int w, int h) {
+        glViewport(0, 0, w, h);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(45.0, (float)w / h, 0.1, 100.0);
+        glMatrixMode(GL_MODELVIEW);
     });
-    glutTimerFunc(1000, fire, 0); 
+    glutTimerFunc(1000, fire, 0);
     glutTimerFunc(16, update, 0);
     glutMainLoop();
     return 0;
