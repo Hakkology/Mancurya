@@ -97,11 +97,16 @@ void Fleet::fire(std::vector<Ship> &targetShips, bool isMancurian) {
   }
 }
 
-void Fleet::draw(bool isFrench) {
+void Fleet::draw(bool isFrench, float storyTimer) {
   for (auto &ship : ships) {
+    // Calculate wave height for ship bobbing
+    float h = sin(ship.x * 1.2f + storyTimer * 1.1f) * 0.04f;
+    h += cos(ship.z * 1.0f + storyTimer * 1.3f) * 0.03f;
+
+    // --- Ship Pass ---
     glPushMatrix();
-    glTranslatef(ship.x, ship.y, ship.z);
-    glScalef(ship.scale, ship.scale, ship.scale); // Individual ship scaling
+    glTranslatef(ship.x, ship.y + h, ship.z); 
+    glScalef(ship.scale, ship.scale, ship.scale); 
     drawShip(0, 0, 0.2f, 0.12f, isFrench ? 0.1f : 0.4f, isFrench ? 0.1f : 0.2f,
              isFrench ? 0.5f : 0.1f, isFrench);
 

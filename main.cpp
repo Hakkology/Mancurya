@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include <ctime>
 #include <algorithm>
+#include <vector>
 
 using namespace Mancurya;
 
@@ -20,7 +21,12 @@ void display() {
     gluLookAt(0.0f, 1.2f, 7.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
     
     env.draw(storyTimer);
-    sea.draw(fleets.explosions);
+    
+    // Aggregating all ships for shader-based shadows
+    std::vector<Ship> allShips = fleets.mancurianFleet.ships;
+    allShips.insert(allShips.end(), fleets.frenchFleet.ships.begin(), fleets.frenchFleet.ships.end());
+    sea.draw(fleets.explosions, allShips, storyTimer);
+    
     fleets.draw(storyTimer);
 
     // Story UI

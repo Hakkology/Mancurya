@@ -13,9 +13,9 @@ void Sea::update() {
     waveOffset += 0.01f;
 }
 
-void Sea::draw(const std::vector<Explosion>& explosions) {
+void Sea::draw(const std::vector<Explosion>& explosions, const std::vector<Ship>& ships, float storyTimer) {
     shader.use();
-    shader.setUniform1f("time", waveOffset * 10.0f);
+    shader.setUniform1f("time", storyTimer);
     
     // Pass Explosion Data to Shader
     for (int i = 0; i < 8; i++) {
@@ -32,6 +32,23 @@ void Sea::draw(const std::vector<Explosion>& explosions) {
         } else {
             GLint gloc = glGetUniformLocation(shader.program, glowName);
             if (gloc != -1) glUniform1f(gloc, 0.0f);
+        }
+    }
+
+    // Pass Ship Data for Shadows (Initializing all 64 slots for stability)
+    int sCount = (int)std::min((size_t)64, ships.size());
+    shader.setUniform1i("shipCount", sCount);
+    for (int i = 0; i < 64; i++) {
+        char posName[32], scaleName[32];
+        snprintf(posName, sizeof(posName), "shipPos[%d]", i);
+        snprintf(scaleName, sizeof(scaleName), "shipScale[%d]", i);
+        
+        if (i < sCount) {
+            shader.setUniform3f(posName, ships[i].x, ships[i].y, ships[i].z);
+            shader.setUniform1f(scaleName, ships[i].scale);
+        } else {
+            shader.setUniform3f(posName, 0.0f, -100.0f, 0.0f);
+            shader.setUniform1f(scaleName, 1.0f);
         }
     }
     

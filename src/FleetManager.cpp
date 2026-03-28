@@ -31,8 +31,8 @@ void FleetManager::fire() {
 }
 
 void FleetManager::draw(float storyTimer) {
-    mancurianFleet.draw(false);
-    frenchFleet.draw(true);
+    mancurianFleet.draw(false, storyTimer);
+    frenchFleet.draw(true, storyTimer);
 
     projectileShader.use();
     projectileShader.setUniform1f("time", storyTimer);

@@ -14,7 +14,7 @@ public:
     
     void init();
     void update();
-    void draw(const std::vector<Explosion>& explosions);
+    void draw(const std::vector<Explosion>& explosions, const std::vector<Ship>& ships, float storyTimer);
 };
 
 }
