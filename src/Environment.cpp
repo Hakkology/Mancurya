@@ -36,6 +36,17 @@ void Environment::draw(float storyTimer) {
     glColor3f(0.01f, 0.01f, 0.02f); glVertex2f(1, -1); glVertex2f(-1, -1);
   glEnd();
 
+  // Mountain Silhouettes (Simple Triangles - Visible Dark Brown/Earth)
+  glBegin(GL_TRIANGLES);
+    glColor3f(0.1f, 0.07f, 0.04f); 
+    // Left peak
+    glVertex2f(-1.1f, -0.3f); glVertex2f(-0.6f, 0.25f); glVertex2f(-0.1f, -0.3f);
+    // Center peak (Tallest)
+    glVertex2f(-0.4f, -0.3f); glVertex2f(0.1f, 0.5f); glVertex2f(0.6f, -0.3f);
+    // Right peak
+    glVertex2f(0.3f, -0.3f); glVertex2f(0.9f, 0.2f); glVertex2f(1.4f, -0.3f);
+  glEnd();
+
   // Stars
   glBegin(GL_POINTS);
   for (auto &s : stars) {

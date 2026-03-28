@@ -38,6 +38,7 @@ void Sea::draw(const std::vector<Explosion>& explosions, const std::vector<Ship>
     // Pass Ship Data for Shadows (Initializing all 64 slots for stability)
     int sCount = (int)std::min((size_t)64, ships.size());
     shader.setUniform1i("shipCount", sCount);
+    shader.setUniform1f("storyTimer", storyTimer);
     for (int i = 0; i < 64; i++) {
         char posName[32], scaleName[32];
         snprintf(posName, sizeof(posName), "shipPos[%d]", i);

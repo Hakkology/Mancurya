@@ -5,6 +5,7 @@ uniform vec3 explosionPos[8];
 uniform float explosionGlow[8];
 uniform vec3 shipPos[64];
 uniform float shipScale[64];
+uniform float storyTimer;
 uniform int shipCount;
 
 void main() {
@@ -38,7 +39,9 @@ void main() {
         vec2 diff = worldPos.xz - shipPos[i].xz;
         
         // Normalized Relative Coordinates (Sleek Narrow width)
-        float dx = abs(diff.x) / max(0.01, shipScale[i] * 0.22);
+        // Add subtle wave-based jitter to shadow edges for 'pro-grade' realism
+        float jitter = sin(worldPos.x * 3.0 + storyTimer * 2.0) * 0.03;
+        float dx = abs(diff.x + jitter) / max(0.01, shipScale[i] * 0.22);
         float dz = (diff.y + shipScale[i] * 0.15) / max(0.01, shipScale[i] * 2.2);
         
         // Circular/Ellipse distance for 'shapeless' blob look
@@ -46,6 +49,9 @@ void main() {
         
         // Base Soft Mask
         float s = smoothstep(1.5, 0.0, dist);
+        
+        // Depth Decay: Shadow gets weaker as it stretches away from hull
+        s *= (1.0 - smoothstep(0.0, 2.8, dz)); 
         
         // Asymmetric Fading: Fades out behind the ship (dz < 0) 
         // while remaining soft under the hull
