@@ -20,7 +20,7 @@ void display() {
     gluLookAt(0.0f, 1.2f, 7.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
     
     env.draw(storyTimer);
-    sea.draw();
+    sea.draw(fleets.explosions);
     fleets.draw(storyTimer);
 
     // Story UI
@@ -80,8 +80,12 @@ void init() {
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
-    GLfloat lp[] = {1.0f, 5.0f, 5.0f, 1.0f};
+    GLfloat lp[] = {0.0f, 2.0f, 3.0f, 1.0f};
+    GLfloat ambient[] = { 0.1f, 0.1f, 0.15f, 1.0f };
+    GLfloat diffuse[] = { 0.6f, 0.6f, 0.7f, 1.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, lp);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

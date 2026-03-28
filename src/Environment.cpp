@@ -30,10 +30,10 @@ void Environment::draw(float storyTimer) {
   
   glDisable(GL_DEPTH_TEST);
   
-  // Sky Background
+  // Sky Background (Darker Night)
   glBegin(GL_QUADS);
-    glColor3f(0.01f, 0.01f, 0.05f); glVertex2f(-1, 1); glVertex2f(1, 1);
-    glColor3f(0.05f, 0.02f, 0.02f); glVertex2f(1, -1); glVertex2f(-1, -1);
+    glColor3f(0.002f, 0.002f, 0.01f); glVertex2f(-1, 1); glVertex2f(1, 1);
+    glColor3f(0.01f, 0.01f, 0.02f); glVertex2f(1, -1); glVertex2f(-1, -1);
   glEnd();
 
   // Stars

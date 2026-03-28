@@ -39,13 +39,17 @@ void FleetManager::draw(float storyTimer) {
     Shader::stop();
 
     glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE); // Additive blending for glow
     for (auto &e : explosions) {
         glPushMatrix();
         glTranslatef(e.x, e.y, e.z);
-        glColor3f(1.0f, 0.5f, 0.0f);
-        glutSolidSphere(0.1f * (1.0f - e.timer / 30.0f), 10, 10);
+        float r = 0.3f * (1.0f - (float)e.timer / 30.0f);
+        glColor4f(1.0f, 0.6f, 0.2f, (float)e.timer / 30.0f);
+        glutSolidSphere(r, 12, 12);
         glPopMatrix();
     }
+    glDisable(GL_BLEND);
     glEnable(GL_LIGHTING);
 }
 

@@ -1,6 +1,6 @@
+#include <Mancurya/Fleet.hpp>
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include <Mancurya/Fleet.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -127,16 +127,18 @@ void Fleet::draw(bool isFrench) {
     glPopMatrix();
   }
 
+  glDisable(GL_LIGHTING);
   for (auto &bomb : projectiles) {
     glPushMatrix();
     glTranslatef(bomb.x, bomb.y, bomb.z);
     if (isFrench)
-      glColor3f(0.8f, 0.6f, 0.3f);
+      glColor3f(1.0f, 0.9f, 0.4f); 
     else
-      glColor3f(0.3f, 0.2f, 0.1f);
-    glutSolidCube(0.04);
+      glColor3f(1.0f, 0.7f, 0.2f);
+    glutSolidSphere(0.03, 8, 8);
     glPopMatrix();
   }
+  glEnable(GL_LIGHTING);
 }
 
 void Fleet::drawShip(float x, float y, float w, float h, float r, float g,

@@ -2,6 +2,8 @@
 #define MANCURYA_SEA_HPP
 
 #include <Mancurya/Shader.hpp>
+#include <Mancurya/Types.hpp>
+#include <vector>
 
 namespace Mancurya {
 
@@ -12,7 +14,7 @@ public:
     
     void init();
     void update();
-    void draw();
+    void draw(const std::vector<Explosion>& explosions);
 };
 
 }

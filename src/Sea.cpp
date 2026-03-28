@@ -1,5 +1,7 @@
 #include <Mancurya/Sea.hpp>
 #include <GL/gl.h>
+#include <cstdio>
+#include <vector>
 
 namespace Mancurya {
 
@@ -11,11 +13,28 @@ void Sea::update() {
     waveOffset += 0.01f;
 }
 
-void Sea::draw() {
+void Sea::draw(const std::vector<Explosion>& explosions) {
     shader.use();
     shader.setUniform1f("time", waveOffset * 10.0f);
     
-    // Performance Optimized: GL_TRIANGLE_STRIP for efficient GPU rendering
+    // Pass Explosion Data to Shader
+    for (int i = 0; i < 8; i++) {
+        char posName[32], glowName[32];
+        snprintf(posName, sizeof(posName), "explosionPos[%d]", i);
+        snprintf(glowName, sizeof(glowName), "explosionGlow[%d]", i);
+        
+        if (i < (int)explosions.size()) {
+            GLint ploc = glGetUniformLocation(shader.program, posName);
+            if (ploc != -1) glUniform3f(ploc, explosions[i].x, explosions[i].y, explosions[i].z);
+            
+            GLint gloc = glGetUniformLocation(shader.program, glowName);
+            if (gloc != -1) glUniform1f(gloc, (float)explosions[i].timer / 30.0f);
+        } else {
+            GLint gloc = glGetUniformLocation(shader.program, glowName);
+            if (gloc != -1) glUniform1f(gloc, 0.0f);
+        }
+    }
+    
     float step = 0.1f; 
     for (float x = -10.0f; x < 10.0f; x += step) {
         glBegin(GL_TRIANGLE_STRIP);
