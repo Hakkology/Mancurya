@@ -16,6 +16,7 @@ add_executable(mancurya
     src/Environment.cpp
     src/Sea.cpp
     src/FleetManager.cpp
+    src/Fleet.cpp
 )
 
 target_link_libraries(mancurya PRIVATE ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLU_LIBRARIES} ${GLEW_LIBRARIES} -lX11)

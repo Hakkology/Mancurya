@@ -13,4 +13,5 @@ echo "Launching Mancurya 3D Naval Simulation..."
 sudo docker run -it --rm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
+    --device /dev/dri:/dev/dri \
     mancurya
