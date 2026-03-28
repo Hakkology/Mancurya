@@ -1,29 +1,148 @@
-// 1696: Mancurya-Marsilya Artillery Battle (HD Update)
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
+#include <GL/glx.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
+
+// --- Manuel Shader yükleme sistemi ---
+// Not: Modern sistemlerde 'GLEW' veya 'GLAD' gibi kütüphaneler bu işi otomatik yapar.
+// Ancak sistemde kütüphane olmadığı için, ekran kartı sürücüsünden bu fonksiyonların 
+// adresini manuel olarak ("glXGetProcAddressARB" ile) çekiyoruz.
+
+// APIENTRY: Bu bir 'Calling Convention' makrosudur.
+// Fonksiyonların işlemci seviyesinde hangi sırada ve nasıl çağrılacağını (stack yönetimi vb.) belirtir.
+// OpenGL'in ekran kartı sürücüsüyle 'aynı dili' konuşmasını sağlar, uyumsuzlukları önler.
+
+typedef GLuint (APIENTRYP PFNGLCREATESHADERPROC) (GLenum type);
+typedef void (APIENTRYP PFNGLSHADERSOURCEPROC) (GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+typedef void (APIENTRYP PFNGLCOMPILESHADERPROC) (GLuint shader);
+typedef GLuint (APIENTRYP PFNGLCREATEPROGRAMPROC) (void);
+typedef void (APIENTRYP PFNGLATTACHSHADERPROC) (GLuint program, GLuint shader);
+typedef void (APIENTRYP PFNGLLINKPROGRAMPROC) (GLuint program);
+typedef void (APIENTRYP PFNGLUSEPROGRAMPROC) (GLuint program);
+typedef GLint (APIENTRYP PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const GLchar* name);
+typedef void (APIENTRYP PFNGLUNIFORM1FPROC) (GLint location, GLfloat v0);
+
+PFNGLCREATESHADERPROC glCreateShader_ptr;
+PFNGLSHADERSOURCEPROC glShaderSource_ptr;
+PFNGLCOMPILESHADERPROC glCompileShader_ptr;
+PFNGLCREATEPROGRAMPROC glCreateProgram_ptr;
+PFNGLATTACHSHADERPROC glAttachShader_ptr;
+PFNGLLINKPROGRAMPROC glLinkProgram_ptr;
+PFNGLUSEPROGRAMPROC glUseProgram_ptr;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_ptr;
+PFNGLUNIFORM1FPROC glUniform1f_ptr;
+
+GLuint projectileShader;
+GLuint waterShader;
+GLint projTimeLoc;
+GLint waterTimeLoc;
+
+std::string readShaderFile(const char* filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) return "";
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+GLuint createShaderProgram(const char* vPath, const char* fPath) {
+    if (!glCreateShader_ptr) return 0;
+
+    std::string vSourceStr = readShaderFile(vPath);
+    std::string fSourceStr = readShaderFile(fPath);
+    const char* vSource = vSourceStr.c_str();
+    const char* fSource = fSourceStr.c_str();
+
+    GLuint vs = glCreateShader_ptr(GL_VERTEX_SHADER);
+    glShaderSource_ptr(vs, 1, &vSource, NULL);
+    glCompileShader_ptr(vs);
+
+    GLuint fs = glCreateShader_ptr(GL_FRAGMENT_SHADER);
+    glShaderSource_ptr(fs, 1, &fSource, NULL);
+    glCompileShader_ptr(fs);
+
+    GLuint program = glCreateProgram_ptr();
+    glAttachShader_ptr(program, vs);
+    glAttachShader_ptr(program, fs);
+    glLinkProgram_ptr(program);
+    return program;
+}
+
+void loadShaders() {
+    glCreateShader_ptr = (PFNGLCREATESHADERPROC)glXGetProcAddressARB((const GLubyte*)"glCreateShader");
+    glShaderSource_ptr = (PFNGLSHADERSOURCEPROC)glXGetProcAddressARB((const GLubyte*)"glShaderSource");
+    glCompileShader_ptr = (PFNGLCOMPILESHADERPROC)glXGetProcAddressARB((const GLubyte*)"glCompileShader");
+    glCreateProgram_ptr = (PFNGLCREATEPROGRAMPROC)glXGetProcAddressARB((const GLubyte*)"glCreateProgram");
+    glAttachShader_ptr = (PFNGLATTACHSHADERPROC)glXGetProcAddressARB((const GLubyte*)"glAttachShader");
+    glLinkProgram_ptr = (PFNGLLINKPROGRAMPROC)glXGetProcAddressARB((const GLubyte*)"glLinkProgram");
+    glUseProgram_ptr = (PFNGLUSEPROGRAMPROC)glXGetProcAddressARB((const GLubyte*)"glUseProgram");
+    glGetUniformLocation_ptr = (PFNGLGETUNIFORMLOCATIONPROC)glXGetProcAddressARB((const GLubyte*)"glGetUniformLocation");
+    glUniform1f_ptr = (PFNGLUNIFORM1FPROC)glXGetProcAddressARB((const GLubyte*)"glUniform1f");
+
+    if (!glCreateShader_ptr) return;
+
+    projectileShader = createShaderProgram("../shaders/projectile.vert", "../shaders/projectile.frag");
+    waterShader = createShaderProgram("../shaders/water.vert", "../shaders/water.frag");
+
+    if (glGetUniformLocation_ptr) {
+        projTimeLoc = glGetUniformLocation_ptr(projectileShader, "time");
+        waterTimeLoc = glGetUniformLocation_ptr(waterShader, "time");
+    }
+}
+// ----------------------
 
 const float PI = 3.1415926535f;
 
+struct Ship {
+    float x, y, z;
+    bool isBurning = false;
+};
+
+std::vector<Ship> mancurianFleet;
+std::vector<Ship> frenchFleet;
+
 struct Projectile {
-  float x, y, vx, vy, speed, angle;
+  float x, y, z;
+  float vx, vy, vz;
   bool isExploded = false;
-  float timeAlive = 0.0f;
 };
 
 std::vector<Projectile> mancurianBombs;
 std::vector<Projectile> frenchBombs;
-float mancurianShipX = -0.8f, frenchShipX = 0.8f; // Gemileri ayırdım
-float shipY = -0.4f, shipWidth = 0.2f, shipHeight = 0.15f;
-float gravity = -0.005f;
-int explosionTimer = 0;
-float explosionX, explosionY;
+
+struct Explosion {
+    float x, y, z;
+    int timer;
+};
+std::vector<Explosion> activeExplosions;
+
+float shipWidth = 0.2f, shipHeight = 0.12f;
+float shipY = -0.4f;
+float gravity = -0.003f;
 bool isBaguetteDepotBurning = false;
 float storyTimer = 0.0f;
+
+void initFleets() {
+    mancurianFleet.clear();
+    frenchFleet.clear();
+    for (int i = 0; i < 4; i++) {
+        float zPos = -1.2f + i * 0.8f + (rand()%100/200.0f - 0.25f);
+        float xOff = (rand()%100/500.0f - 0.1f);
+        mancurianFleet.push_back({-1.5f + xOff, shipY, zPos});
+        
+        zPos = -1.2f + i * 0.8f + (rand()%100/200.0f - 0.25f);
+        xOff = (rand()%100/500.0f - 0.1f);
+        frenchFleet.push_back({1.5f + xOff, shipY, zPos});
+    }
+}
 
 struct Star {
   float x, y, size;
@@ -48,13 +167,67 @@ void drawCircle(float cx, float cy, float r, int num_segments, float red,
   glEnd();
 }
 
-void drawShip(float x, float y, float w, float h, float r, float g, float b) {
+void drawShip(float x, float y, float w, float h, float r, float g, float b, bool isFrench) {
+  glPushMatrix();
+  glTranslatef(x, y, 0);
   glColor3f(r, g, b);
-  glRectf(x - w / 2, y - h / 2, x + w / 2, y + h / 2);
+  
+  // Gövde (Hull)
+  glPushMatrix();
+  glScalef(w, h, w/2);
+  glutSolidCube(1.0);
+  glPopMatrix();
 
-  // Basit bir direk ekleyelim
-  glColor3f(r * 0.7f, g * 0.7f, b * 0.7f);
-  glRectf(x - 0.01f, y + h / 2, x + 0.01f, y + h / 2 + 0.1f);
+  // Direklere daha derin renk
+  glColor3f(0.3f, 0.2f, 0.1f);
+  glPushMatrix();
+  glTranslatef(0, h/2 + 0.1f, 0);
+  glScalef(0.015f, 0.35f, 0.015f);
+  glutSolidCube(1.0);
+  glPopMatrix();
+
+  // Yelkenler (Sails)
+  if (isFrench) {
+    glColor4f(0.9f, 0.9f, 0.9f, 0.9f); // Beyaz yelken
+    glPushMatrix();
+    glTranslatef(0, h/2 + 0.15f, 0);
+    glRotatef(90, 0, 1, 0);
+    glScalef(0.18f, 0.25f, 0.01f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+  } else {
+    glColor4f(0.7f, 0.1f, 0.1f, 0.9f); // Kırmızı Mançurya yelkeni
+    glPushMatrix();
+    glTranslatef(0, h/2 + 0.15f, 0);
+    glRotatef(110, 0, 1, 0);
+    glScalef(0.15f, 0.28f, 0.15f);
+    glutSolidCone(1.0, 1.0, 4, 1);
+    glPopMatrix();
+  }
+
+  glPopMatrix();
+}
+
+void drawBaguetteDepot(float x, float y) {
+  glPushMatrix();
+  glTranslatef(x, y, 0);
+  glColor3f(0.6f, 0.4f, 0.2f);
+  glPushMatrix();
+  glScalef(0.2f, isBaguetteDepotBurning ? 0.05f : 0.1f, 0.1f);
+  glutSolidCube(1.0f);
+  glPopMatrix();
+  
+  if (isBaguetteDepotBurning) {
+    glDisable(GL_LIGHTING);
+    for (int i = 0; i < 5; i++) {
+        glPushMatrix();
+        glTranslatef((rand() % 10 - 5) / 50.0f, 0.05f + (rand() % 10) / 100.0f, 0);
+        drawCircle(0, 0, 0.03f, 8, 1.0f, 0.3f, 0.0f, 0.8f);
+        glPopMatrix();
+    }
+    glEnable(GL_LIGHTING);
+  }
+  glPopMatrix();
 }
 
 void drawBaguette(float x, float y, float vx, float vy) {
@@ -62,49 +235,34 @@ void drawBaguette(float x, float y, float vx, float vy) {
   glPushMatrix();
   glTranslatef(x, y, 0);
   glRotatef(angle, 0, 0, 1);
-  // Baget gövdesi
   glColor3f(0.8f, 0.6f, 0.3f);
-  glRectf(-0.06f, -0.015f, 0.06f, 0.015f);
-  // Çizikler
-  glColor3f(0.6f, 0.4f, 0.2f);
-  glBegin(GL_LINES);
-  for(float i=-0.04f; i<=0.04f; i+=0.02f) {
-      glVertex2f(i, -0.01f); glVertex2f(i+0.01f, 0.01f);
-  }
-  glEnd();
+  glScalef(0.12f, 0.03f, 0.03f);
+  glutSolidCube(1.0f);
   glPopMatrix();
 }
 
 void drawCroissant(float x, float y) {
-  drawCircle(x, y, 0.03f, 8, 0.9f, 0.7f, 0.2f); // Basit bir kruvasan şekli
-  drawCircle(x+0.02f, y, 0.02f, 8, 0.9f, 0.7f, 0.2f);
-  drawCircle(x-0.02f, y, 0.02f, 8, 0.9f, 0.7f, 0.2f);
+  glPushMatrix();
+  glTranslatef(x, y, 0.1f);
+  glColor3f(0.9f, 0.7f, 0.2f);
+  glutSolidSphere(0.04f, 8, 8);
+  glPopMatrix();
 }
 
 void drawHorse(float x, float y) {
-    // Bağımlı at (Basit şekil)
+    glPushMatrix();
+    glTranslatef(x, y, 0.1f);
     glColor3f(0.4f, 0.2f, 0.1f);
-    glRectf(x-0.03f, y-0.02f, x+0.03f, y+0.02f); // Gövde
-    glRectf(x+0.02f, y+0.02f, x+0.05f, y+0.05f); // Boyun/Kafa
-    // Ayaklar
-    glBegin(GL_LINES);
-    glVertex2f(x-0.02f, y-0.02f); glVertex2f(x-0.02f, y-0.04f);
-    glVertex2f(x+0.02f, y-0.02f); glVertex2f(x+0.02f, y-0.04f);
-    glEnd();
-}
-
-void drawBaguetteDepot(float x, float y) {
-  // Ekmek deposu (Kahverengi kutu)
-  glColor3f(0.6f, 0.4f, 0.2f);
-  glRectf(x - 0.1f, y - 0.05f * (isBaguetteDepotBurning ? 0.5f : 1.0f), x + 0.1f, y + 0.05f);
-  
-  if (isBaguetteDepotBurning) {
-    // Alev efekti (Kırmızı-Sarı)
-    for (int i = 0; i < 5; i++) {
-        drawCircle(x + (rand() % 10 - 5) / 50.0f, y + 0.05f + (rand() % 10) / 100.0f, 
-                   0.03f, 8, 1.0f, 0.3f, 0.0f, 0.8f);
-    }
-  }
+    glPushMatrix(); // Gövde
+    glScalef(0.06f, 0.04f, 0.04f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+    glPushMatrix(); // Kafa
+    glTranslatef(0.04f, 0.03f, 0);
+    glScalef(0.03f, 0.03f, 0.03f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+    glPopMatrix();
 }
 
 void drawSoySauceArrow(float x, float y, float vx, float vy) {
@@ -113,29 +271,42 @@ void drawSoySauceArrow(float x, float y, float vx, float vy) {
   glTranslatef(x, y, 0);
   glRotatef(angle, 0, 0, 1);
   
-  // Ok gövdesi (Koyu Soya Sosu rengi)
   glColor3f(0.3f, 0.15f, 0.05f);
-  glBegin(GL_LINES);
-  glVertex2f(-0.04f, 0);
-  glVertex2f(0.04f, 0);
-  glEnd();
+  glPushMatrix(); // Gövde
+  glScalef(0.1f, 0.01f, 0.01f);
+  glutSolidCube(1.0f);
+  glPopMatrix();
   
-  // Ok ucu (Acılı kırmızı)
   glColor3f(0.8f, 0.1f, 0.0f);
-  glBegin(GL_TRIANGLES);
-  glVertex2f(0.04f, 0.01f);
-  glVertex2f(0.04f, -0.01f);
-  glVertex2f(0.06f, 0);
-  glEnd();
+  glPushMatrix(); // Uç
+  glTranslatef(0.05f, 0, 0);
+  glRotatef(90, 0, 1, 0);
+  glutSolidCone(0.02, 0.04, 8, 1);
+  glPopMatrix();
   
   glPopMatrix();
 }
 
 void renderText(float x, float y, const char* text, void* font = GLUT_BITMAP_HELVETICA_18) {
+  glDisable(GL_LIGHTING); // Metin etkilenmesin
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(-1, 1, -1, 1, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  
   glRasterPos2f(x, y);
   for (const char* c = text; *c != '\0'; c++) {
     glutBitmapCharacter(font, *c);
   }
+  
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glEnable(GL_LIGHTING);
 }
 
 void drawExplosion(float x, float y, int timer) {
@@ -158,226 +329,275 @@ void addSmoke(float x, float y) {
 }
 
 void update(int value) {
-  // Mançurya Bombalarını Güncelle
-  for (int i = 0; i < mancurianBombs.size(); i++) {
-    if (!mancurianBombs[i].isExploded) {
-      mancurianBombs[i].vx =
-          mancurianBombs[i].speed * cos(mancurianBombs[i].angle * PI / 180.0f);
-      mancurianBombs[i].vy += gravity; // Yerçekimi
-      mancurianBombs[i].x += mancurianBombs[i].vx;
-      mancurianBombs[i].y += mancurianBombs[i].vy;
+  storyTimer += 0.016f;
+  waveOffset += 0.01f;
 
-      // Çarpışma kontrolü (Fransız amiralleri/baget depoları)
-      if (mancurianBombs[i].y < shipY + shipHeight / 2 &&
-          abs(mancurianBombs[i].x - frenchShipX) < shipWidth / 2) {
-        mancurianBombs[i].isExploded = true;
-        isBaguetteDepotBurning = true;
-        explosionX = mancurianBombs[i].x;
-        explosionY = mancurianBombs[i].y;
-        explosionTimer = 30;
+  for (auto &b : mancurianBombs) {
+    if (!b.isExploded) {
+      b.vy += gravity; 
+      b.x += b.vx;
+      b.y += b.vy;
+      b.z += b.vz;
+
+      for (auto &ship : frenchFleet) {
+          if (b.y < ship.y + shipHeight/2 && abs(b.x - ship.x) < 0.2f && abs(b.z - ship.z) < 0.2f) {
+            b.isExploded = true;
+            ship.isBurning = true;
+            activeExplosions.push_back({b.x, b.y, b.z, 30});
+          }
       }
-
-      // Suya düşme kontrolü
-      if (mancurianBombs[i].y < -0.5f) {
-        mancurianBombs[i].isExploded = true;
-        explosionX = mancurianBombs[i].x;
-        explosionY = -0.5f;
-        explosionTimer = 20; // Daha kısa su sıçraması
+      if (b.y < -0.5f) {
+          b.isExploded = true;
+          activeExplosions.push_back({b.x, -0.5f, b.z, 20});
       }
     }
   }
 
-  // Fransız Bombalarını Güncelle
-  for (int i = 0; i < frenchBombs.size(); i++) {
-    if (!frenchBombs[i].isExploded) {
-      frenchBombs[i].vx = frenchBombs[i].speed *
-                          cos((180 - frenchBombs[i].angle) * PI / 180.0f);
-      frenchBombs[i].vy += gravity;
-      frenchBombs[i].x += frenchBombs[i].vx;
-      frenchBombs[i].y += frenchBombs[i].vy;
+  for (auto &b : frenchBombs) {
+    if (!b.isExploded) {
+      b.vy += gravity;
+      b.x -= b.vx; 
+      b.y += b.vy;
+      b.z += b.vz;
 
-      if (frenchBombs[i].y < shipY + shipHeight / 2 &&
-          abs(frenchBombs[i].x - mancurianShipX) < shipWidth / 2) {
-        frenchBombs[i].isExploded = true;
-        explosionX = frenchBombs[i].x;
-        explosionY = frenchBombs[i].y;
-        explosionTimer = 30;
+      for (auto &ship : mancurianFleet) {
+          if (b.y < ship.y + shipHeight/2 && abs(b.x - ship.x) < 0.2f && abs(b.z - ship.z) < 0.2f) {
+            b.isExploded = true;
+            ship.isBurning = true;
+            activeExplosions.push_back({b.x, b.y, b.z, 30});
+          }
       }
-
-      if (frenchBombs[i].y < -0.5f) {
-        frenchBombs[i].isExploded = true;
-        explosionX = frenchBombs[i].x;
-        explosionY = -0.5f;
-        explosionTimer = 20;
+      if (b.y < -0.5f) {
+          b.isExploded = true;
+          activeExplosions.push_back({b.x, -0.5f, b.z, 20});
       }
     }
   }
 
-  if (explosionTimer > 0)
-    explosionTimer--;
+  for (int i = 0; i < activeExplosions.size(); i++) {
+      activeExplosions[i].timer--;
+  }
+  activeExplosions.erase(std::remove_if(activeExplosions.begin(), activeExplosions.end(), 
+      [](const Explosion& e){ return e.timer <= 0; }), activeExplosions.end());
 
-  // Parçacıkları güncelle
   for (auto &p : particles) {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life -= 0.02f;
+    p.x += p.vx; p.y += p.vy; p.life -= 0.02f;
   }
   particles.erase(std::remove_if(particles.begin(), particles.end(),
                                  [](const Particle &p) { return p.life <= 0; }),
                   particles.end());
 
-  waveOffset += 0.05f;
-  storyTimer += 0.016f;
-
-  // Yıldızları titret (twinkle)
-  for (auto &s : stars) {
-    if (rand() % 10 == 0) s.size = (rand() % 20 + 1) / 10.0f;
-  }
-
-  // Temizlik: Patlamış bombaları listeden sil
-  mancurianBombs.erase(
-      std::remove_if(mancurianBombs.begin(), mancurianBombs.end(),
-                     [](const Projectile &b) { return b.isExploded; }),
-      mancurianBombs.end());
+  mancurianBombs.erase(std::remove_if(mancurianBombs.begin(), mancurianBombs.end(),
+                                     [](const Projectile &b) { return b.isExploded; }),
+                       mancurianBombs.end());
   frenchBombs.erase(std::remove_if(frenchBombs.begin(), frenchBombs.end(),
                                    [](const Projectile &b) { return b.isExploded; }),
                     frenchBombs.end());
 
   glutPostRedisplay();
-  glutTimerFunc(16, update, 0); // 60 FPS
+  glutTimerFunc(16, update, 0);
 }
 
 void fireBomb(int value) {
-  int fireInterval = 500; // 0.5 saniyede bir
+  int fireInterval = 800; 
 
-  // Mançurya Bombası: Hedefe doğru daha parabolik atış
-  float angle = 60.0f + (rand() % 10 - 5);
-  float speed = 0.07f + (rand() % 10) / 1000.0f;
-  mancurianBombs.push_back({mancurianShipX, shipY + 0.1f, 0, speed, speed, angle});
-  addSmoke(mancurianShipX, shipY + 0.15f);
+  for (const auto &s : mancurianFleet) {
+      if (rand() % 10 < 3) {
+          auto &target = frenchFleet[rand() % frenchFleet.size()];
+          float dx = target.x - s.x;
+          float dz = target.z - s.z;
+          float vy = 0.08f + (rand()%10)/500.0f;
+          float travelTime = -2.0f * vy / gravity;
+          mancurianBombs.push_back({s.x, s.y + 0.1f, s.z, dx/travelTime, vy, dz/travelTime, false});
+          addSmoke(s.x, s.y + 0.15f);
+      }
+  }
 
-  // Fransız Bombası: Hedefe doğru daha parabolik atış
-  angle = 60.0f + (rand() % 10 - 5);
-  speed = 0.07f + (rand() % 10) / 1000.0f;
-  frenchBombs.push_back({frenchShipX, shipY + 0.1f, 0, speed, speed, angle});
-  addSmoke(frenchShipX, shipY + 0.15f);
+  for (const auto &s : frenchFleet) {
+      if (rand() % 10 < 3) {
+          auto &target = mancurianFleet[rand() % mancurianFleet.size()];
+          float dx = s.x - target.x; 
+          float dz = target.z - s.z;
+          float vy = 0.08f + (rand()%10)/500.0f;
+          float travelTime = -2.0f * vy / gravity;
+          frenchBombs.push_back({s.x, s.y + 0.1f, s.z, dx/travelTime, vy, dz/travelTime, false});
+          addSmoke(s.x, s.y + 0.15f);
+      }
+  }
 
   glutTimerFunc(fireInterval, fireBomb, 0);
 }
 
 void display() {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(0.0f, 1.5f, 3.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f);
 
-  // Arka Plan: Gradient Gökyüzü (Realism!)
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
   glBegin(GL_QUADS);
-  glColor3f(0.02f, 0.02f, 0.1f); glVertex2f(-1, 1);  // Gece Mavisi
+  glColor3f(0.02f, 0.02f, 0.1f); glVertex2f(-1, 1);
   glColor3f(0.02f, 0.02f, 0.1f); glVertex2f(1, 1);
-  glColor3f(0.3f, 0.1f, 0.1f); glVertex2f(1, -0.5f); // Gün Batımı / Dumanlı ufk
-  glColor3f(0.3f, 0.1f, 0.1f); glVertex2f(-1, -0.5f);
+  glColor3f(0.3f, 0.1f, 0.1f); glVertex2f(1, -1);
+  glColor3f(0.3f, 0.1f, 0.1f); glVertex2f(-1, -1);
   glEnd();
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
 
-  // Arka Plan: Yıldızlar
-  glPointSize(1.0f);
+  glDisable(GL_LIGHTING);
   glBegin(GL_POINTS);
   for (const auto &s : stars) {
     glColor4f(1.0f, 1.0f, 1.0f, s.size / 2.0f);
-    glVertex2f(s.x, s.y);
+    glVertex3f(s.x, s.y, -5.0f);
   }
   glEnd();
 
-  // Arka Plan: Ay
-  drawCircle(0.7f, 0.7f, 0.1f, 30, 0.9f, 0.9f, 0.8f);
-  drawCircle(0.66f, 0.72f, 0.09f, 30, 0.1f, 0.05f, 0.1f);
-
-  // Deniz (Yansımalar İçin Alan)
-  glBegin(GL_QUAD_STRIP);
-  for (float x = -1.0f; x <= 1.05f; x += 0.05f) {
-    float wave = 0.02f * sinf(x * 10.0f + waveOffset);
-    glColor4f(0.0f, 0.15f, 0.4f, 1.0f);
-    glVertex2f(x, -0.5f + wave);
-    glColor4f(0.0f, 0.05f, 0.2f, 1.0f);
-    glVertex2f(x, -1.0f);
-  }
-  glEnd();
-
-  // YANSIMALAR (Realism ++ )
   glPushMatrix();
-  glTranslatef(0, -1.0f, 0); // Su yüzeyine göre aynalama
-  glScalef(1.0f, -0.5f, 1.0f); // Ters çevir ve basıklaştır
-  
-  // Gemilerin Yansıması
-  drawShip(mancurianShipX, shipY, shipWidth, shipHeight, 0.4f, 0.2f, 0.1f);
-  drawShip(frenchShipX, shipY, shipWidth, shipHeight, 0.1f, 0.1f, 0.5f);
-  drawBaguetteDepot(frenchShipX, shipY + 0.15f);
-  
+  glTranslatef(1.5f, 1.5f, -2.0f);
+  glColor3f(0.9f, 0.9f, 0.8f);
+  glutSolidSphere(0.2, 20, 20);
   glPopMatrix();
+  glEnable(GL_LIGHTING);
 
-  // Duman Parçacıkları (Real Glow)
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  for (const auto &p : particles) {
-    drawCircle(p.x, p.y, 0.015f, 6, p.r, p.g, p.b, p.life * 0.5f);
+  // Deniz (3D Yoğun Izgara + Shader)
+  if (glUseProgram_ptr) {
+      glUseProgram_ptr(waterShader);
+      if (glUniform1f_ptr) glUniform1f_ptr(waterTimeLoc, waveOffset * 8.0f);
   }
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glPushMatrix();
+  glBegin(GL_QUADS);
+  for (float x = -6.0f; x <= 6.0f; x += 0.2f) {
+      for (float z = -6.0f; z <= 6.0f; z += 0.2f) {
+          glColor4f(0.0f, 0.25f, 0.45f, 0.85f);
+          glVertex3f(x, -0.5f, z);
+          glVertex3f(x + 0.2f, -0.5f, z);
+          glVertex3f(x + 0.2f, -0.5f, z + 0.2f);
+          glVertex3f(x, -0.5f, z + 0.2f);
+      }
+  }
+  glEnd();
+  glPopMatrix();
+  if (glUseProgram_ptr) glUseProgram_ptr(0);
 
-  // Gemiler & Depolar & Atlar
-  drawShip(mancurianShipX, shipY, shipWidth, shipHeight, 0.4f, 0.2f, 0.1f);
-  drawHorse(mancurianShipX - 0.05f, shipY + 0.1f);
-  drawCroissant(mancurianShipX + 0.05f, shipY + 0.1f);
+  // Filoları Çiz (Dikey/Z Düzeni + Detaylı Gemiler)
+  for (auto &s : mancurianFleet) {
+      glPushMatrix();
+      glTranslatef(0, 0, s.z);
+      drawShip(s.x, s.y, shipWidth, shipHeight, 0.4f, 0.2f, 0.1f, false);
+      if (s.isBurning) {
+          glDisable(GL_LIGHTING);
+          drawCircle(s.x, s.y + 0.12f, 0.05f, 8, 1.0f, 0.3f, 0.0f, 0.8f);
+          glEnable(GL_LIGHTING);
+      }
+      glPopMatrix();
+  }
+  if (!mancurianFleet.empty()) {
+      glPushMatrix();
+      glTranslatef(mancurianFleet[0].x, mancurianFleet[0].y, mancurianFleet[0].z);
+      drawHorse(-0.1f, 0.1f);
+      drawCroissant(0.05f, 0.1f);
+      glPopMatrix();
+  }
   
-  drawBaguetteDepot(frenchShipX, shipY + 0.15f);
-  drawShip(frenchShipX, shipY, shipWidth, shipHeight, 0.1f, 0.1f, 0.5f);
-
-  // Projeler
-  for (const auto &b : mancurianBombs)
-    if (!b.isExploded)
-      drawSoySauceArrow(b.x, b.y, b.vx, b.vy);
-  for (const auto &b : frenchBombs)
-    if (!b.isExploded)
-      drawBaguette(b.x, b.y, b.vx, b.vy);
-
-  // Metin Katmanı
-  glColor3f(1.0f, 1.0f, 0.0f);
-  if (storyTimer < 5.0f) renderText(-0.4f, 0.9f, "Operasyon: Kruvasan Atesi");
-  else if (storyTimer < 10.0f) renderText(-0.4f, 0.9f, "Bize her yer Mancurya!");
-  else if (storyTimer < 15.0f) {
-      glColor3f(1.0f, 0.5f, 0.0f);
-      renderText(-0.5f, 0.9f, "Mancurya Imparatoru: Guzel de, Marsilya neresi?");
-  } else if (storyTimer < 20.0f) {
-      glColor3f(1.0f, 0.8f, 0.0f);
-      renderText(-0.4f, 0.9f, "Atlar kruvasan bagimlisi oldu!");
-  } else {
-      glColor3f(1.0f, 0.0f, 0.0f);
-      renderText(-0.2f, 0.9f, "Pirus Zaferi!");
+  for (auto &s : frenchFleet) {
+      glPushMatrix();
+      glTranslatef(0, 0, s.z);
+      drawShip(s.x, s.y, shipWidth, shipHeight, 0.1f, 0.1f, 0.5f, true);
+      if (s.isBurning) {
+          glDisable(GL_LIGHTING);
+          drawCircle(s.x, s.y + 0.12f, 0.05f, 8, 1.0f, 0.3f, 0.0f, 0.8f);
+          glEnable(GL_LIGHTING);
+      }
+      glPopMatrix();
+  }
+  if (!frenchFleet.empty()) {
+      glPushMatrix();
+      glTranslatef(frenchFleet[0].x, frenchFleet[0].y, frenchFleet[0].z);
+      drawBaguetteDepot(0, 0.15f);
+      glPopMatrix();
   }
 
-  // Patlama
-  if (explosionTimer > 0) {
-    drawExplosion(explosionX, explosionY, explosionTimer);
+  // Projeler (3D Konumlandırma + Shader)
+  if (glUseProgram_ptr) {
+      glUseProgram_ptr(projectileShader);
+      if (glUniform1f_ptr) glUniform1f_ptr(projTimeLoc, storyTimer);
   }
+  for (const auto &b : mancurianBombs) {
+      glPushMatrix();
+      glTranslatef(b.x, b.y, b.z);
+      drawSoySauceArrow(0, 0, b.vx, b.vy);
+      glPopMatrix();
+  }
+  for (const auto &b : frenchBombs) {
+      glPushMatrix();
+      glTranslatef(b.x, b.y, b.z);
+      drawBaguette(0, 0, b.vx, b.vy);
+      glPopMatrix();
+  }
+  if (glUseProgram_ptr) glUseProgram_ptr(0);
 
+  // Metin Katmanı (Hızlı Hikaye)
+  renderText(-0.4f, 0.9f, "Operasyon: Kruvasan Atesi (Dikey Donanma)");
+  if (storyTimer < 3.0f) renderText(-0.4f, 0.8f, "Bize her yer Mancurya!");
+  else if (storyTimer < 6.0f) renderText(-0.5f, 0.8f, "Marsilya Dusuyor! Bagetler Tehlikede!");
+  else if (storyTimer < 9.0f) renderText(-0.6f, 0.8f, "Mancurya Imparatoru: Guzel de, Marsilya neresi?");
+  else if (storyTimer < 12.0f) renderText(-0.4f, 0.8f, "Atlar kruvasan bagimlisi oldu!");
+  else renderText(-0.2f, 0.8f, "Pirus Zaferi!");
+
+  glDisable(GL_LIGHTING);
+  for (const auto &e : activeExplosions) {
+      glPushMatrix();
+      glTranslatef(e.x, e.y, e.z);
+      drawExplosion(0, 0, e.timer);
+      glPopMatrix();
+  }
+  glEnable(GL_LIGHTING);
   glutSwapBuffers();
 }
 
+void reshape(int w, int h) {
+    if (h == 0) h = 1;
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (float)w / (float)h, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void init() {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    GLfloat light_pos[] = { 1.0, 5.0, 5.0, 1.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    loadShaders();
+}
+
 void initStars() {
-  for (int i = 0; i < 100; i++) {
-    stars.push_back({(rand() % 200 - 100) / 100.0f,
-                     (rand() % 150 - 50) / 100.0f, (rand() % 20 + 1) / 10.0f});
+  for (int i = 0; i < 200; i++) {
+    stars.push_back({(rand() % 400 - 200) / 40.0f, (rand() % 400 - 100) / 40.0f, (rand() % 20 + 1) / 10.0f});
   }
 }
 
 int main(int argc, char **argv) {
   srand(time(0));
   initStars();
+  initFleets();
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-  glutInitWindowSize(1280, 720); // Daha büyük ekran
-  glutCreateWindow("1696 Artillery Battle: Mancurya vs Marsilya (HD Update)");
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitWindowSize(1280, 720);
+  glutCreateWindow("3D Operation Croissant Fire");
+  init();
   glutDisplayFunc(display);
-  glutTimerFunc(1000, fireBomb, 0); // Başlangıç gecikmesi
+  glutReshapeFunc(reshape);
+  glutTimerFunc(1000, fireBomb, 0);
   glutTimerFunc(16, update, 0);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glutMainLoop();
   return 0;
 }

@@ -93,8 +93,9 @@ mancurya_EXTERNAL_OBJECTS =
 mancurya: CMakeFiles/mancurya.dir/main.cpp.o
 mancurya: CMakeFiles/mancurya.dir/build.make
 mancurya: /usr/lib/x86_64-linux-gnu/libglut.so
-mancurya: /usr/lib/x86_64-linux-gnu/libGL.so
 mancurya: /usr/lib/x86_64-linux-gnu/libXi.so
+mancurya: /usr/lib/x86_64-linux-gnu/libGL.so
+mancurya: /usr/lib/x86_64-linux-gnu/libGLU.so
 mancurya: CMakeFiles/mancurya.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable mancurya"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/mancurya.dir/link.txt --verbose=$(VERBOSE)
