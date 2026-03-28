@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/mancurya.dir/main.cpp.o -o mancurya  /usr/lib/x86_64-linux-gnu/libglut.so /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libXi.so 

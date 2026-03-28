@@ -1,0 +1,3 @@
+/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles/mancurya.dir
+/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles/edit_cache.dir
+/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles/rebuild_cache.dir
