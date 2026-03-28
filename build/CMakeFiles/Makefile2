@@ -81,12 +81,12 @@ clean: CMakeFiles/mancurya.dir/clean
 CMakeFiles/mancurya.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=1,2 "Built target mancurya"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target mancurya"
 .PHONY : CMakeFiles/mancurya.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/mancurya.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/mancurya.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles 0
 .PHONY : CMakeFiles/mancurya.dir/rule

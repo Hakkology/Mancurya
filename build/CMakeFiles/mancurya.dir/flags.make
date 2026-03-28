@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/include
 
 CXX_FLAGS = -std=gnu++17
 

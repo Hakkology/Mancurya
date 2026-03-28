@@ -83,21 +83,85 @@ CMakeFiles/mancurya.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mancurya.dir/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/main.cpp -o CMakeFiles/mancurya.dir/main.cpp.s
 
+CMakeFiles/mancurya.dir/src/GLBridge.cpp.o: CMakeFiles/mancurya.dir/flags.make
+CMakeFiles/mancurya.dir/src/GLBridge.cpp.o: /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/GLBridge.cpp
+CMakeFiles/mancurya.dir/src/GLBridge.cpp.o: CMakeFiles/mancurya.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/mancurya.dir/src/GLBridge.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mancurya.dir/src/GLBridge.cpp.o -MF CMakeFiles/mancurya.dir/src/GLBridge.cpp.o.d -o CMakeFiles/mancurya.dir/src/GLBridge.cpp.o -c /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/GLBridge.cpp
+
+CMakeFiles/mancurya.dir/src/GLBridge.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mancurya.dir/src/GLBridge.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/GLBridge.cpp > CMakeFiles/mancurya.dir/src/GLBridge.cpp.i
+
+CMakeFiles/mancurya.dir/src/GLBridge.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mancurya.dir/src/GLBridge.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/GLBridge.cpp -o CMakeFiles/mancurya.dir/src/GLBridge.cpp.s
+
+CMakeFiles/mancurya.dir/src/Environment.cpp.o: CMakeFiles/mancurya.dir/flags.make
+CMakeFiles/mancurya.dir/src/Environment.cpp.o: /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Environment.cpp
+CMakeFiles/mancurya.dir/src/Environment.cpp.o: CMakeFiles/mancurya.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/mancurya.dir/src/Environment.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mancurya.dir/src/Environment.cpp.o -MF CMakeFiles/mancurya.dir/src/Environment.cpp.o.d -o CMakeFiles/mancurya.dir/src/Environment.cpp.o -c /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Environment.cpp
+
+CMakeFiles/mancurya.dir/src/Environment.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mancurya.dir/src/Environment.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Environment.cpp > CMakeFiles/mancurya.dir/src/Environment.cpp.i
+
+CMakeFiles/mancurya.dir/src/Environment.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mancurya.dir/src/Environment.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Environment.cpp -o CMakeFiles/mancurya.dir/src/Environment.cpp.s
+
+CMakeFiles/mancurya.dir/src/Sea.cpp.o: CMakeFiles/mancurya.dir/flags.make
+CMakeFiles/mancurya.dir/src/Sea.cpp.o: /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Sea.cpp
+CMakeFiles/mancurya.dir/src/Sea.cpp.o: CMakeFiles/mancurya.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/mancurya.dir/src/Sea.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mancurya.dir/src/Sea.cpp.o -MF CMakeFiles/mancurya.dir/src/Sea.cpp.o.d -o CMakeFiles/mancurya.dir/src/Sea.cpp.o -c /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Sea.cpp
+
+CMakeFiles/mancurya.dir/src/Sea.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mancurya.dir/src/Sea.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Sea.cpp > CMakeFiles/mancurya.dir/src/Sea.cpp.i
+
+CMakeFiles/mancurya.dir/src/Sea.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mancurya.dir/src/Sea.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/Sea.cpp -o CMakeFiles/mancurya.dir/src/Sea.cpp.s
+
+CMakeFiles/mancurya.dir/src/FleetManager.cpp.o: CMakeFiles/mancurya.dir/flags.make
+CMakeFiles/mancurya.dir/src/FleetManager.cpp.o: /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/FleetManager.cpp
+CMakeFiles/mancurya.dir/src/FleetManager.cpp.o: CMakeFiles/mancurya.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/mancurya.dir/src/FleetManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mancurya.dir/src/FleetManager.cpp.o -MF CMakeFiles/mancurya.dir/src/FleetManager.cpp.o.d -o CMakeFiles/mancurya.dir/src/FleetManager.cpp.o -c /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/FleetManager.cpp
+
+CMakeFiles/mancurya.dir/src/FleetManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mancurya.dir/src/FleetManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/FleetManager.cpp > CMakeFiles/mancurya.dir/src/FleetManager.cpp.i
+
+CMakeFiles/mancurya.dir/src/FleetManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mancurya.dir/src/FleetManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hakko/Desktop/Hakan/Projects/C++/Mancurya/src/FleetManager.cpp -o CMakeFiles/mancurya.dir/src/FleetManager.cpp.s
+
 # Object files for target mancurya
 mancurya_OBJECTS = \
-"CMakeFiles/mancurya.dir/main.cpp.o"
+"CMakeFiles/mancurya.dir/main.cpp.o" \
+"CMakeFiles/mancurya.dir/src/GLBridge.cpp.o" \
+"CMakeFiles/mancurya.dir/src/Environment.cpp.o" \
+"CMakeFiles/mancurya.dir/src/Sea.cpp.o" \
+"CMakeFiles/mancurya.dir/src/FleetManager.cpp.o"
 
 # External object files for target mancurya
 mancurya_EXTERNAL_OBJECTS =
 
 mancurya: CMakeFiles/mancurya.dir/main.cpp.o
+mancurya: CMakeFiles/mancurya.dir/src/GLBridge.cpp.o
+mancurya: CMakeFiles/mancurya.dir/src/Environment.cpp.o
+mancurya: CMakeFiles/mancurya.dir/src/Sea.cpp.o
+mancurya: CMakeFiles/mancurya.dir/src/FleetManager.cpp.o
 mancurya: CMakeFiles/mancurya.dir/build.make
 mancurya: /usr/lib/x86_64-linux-gnu/libglut.so
 mancurya: /usr/lib/x86_64-linux-gnu/libXi.so
 mancurya: /usr/lib/x86_64-linux-gnu/libGL.so
 mancurya: /usr/lib/x86_64-linux-gnu/libGLU.so
 mancurya: CMakeFiles/mancurya.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable mancurya"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hakko/Desktop/Hakan/Projects/C++/Mancurya/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable mancurya"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/mancurya.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

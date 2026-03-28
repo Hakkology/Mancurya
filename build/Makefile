@@ -153,6 +153,102 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/Environment.o: src/Environment.cpp.o
+.PHONY : src/Environment.o
+
+# target to build an object file
+src/Environment.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Environment.cpp.o
+.PHONY : src/Environment.cpp.o
+
+src/Environment.i: src/Environment.cpp.i
+.PHONY : src/Environment.i
+
+# target to preprocess a source file
+src/Environment.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Environment.cpp.i
+.PHONY : src/Environment.cpp.i
+
+src/Environment.s: src/Environment.cpp.s
+.PHONY : src/Environment.s
+
+# target to generate assembly for a file
+src/Environment.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Environment.cpp.s
+.PHONY : src/Environment.cpp.s
+
+src/FleetManager.o: src/FleetManager.cpp.o
+.PHONY : src/FleetManager.o
+
+# target to build an object file
+src/FleetManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/FleetManager.cpp.o
+.PHONY : src/FleetManager.cpp.o
+
+src/FleetManager.i: src/FleetManager.cpp.i
+.PHONY : src/FleetManager.i
+
+# target to preprocess a source file
+src/FleetManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/FleetManager.cpp.i
+.PHONY : src/FleetManager.cpp.i
+
+src/FleetManager.s: src/FleetManager.cpp.s
+.PHONY : src/FleetManager.s
+
+# target to generate assembly for a file
+src/FleetManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/FleetManager.cpp.s
+.PHONY : src/FleetManager.cpp.s
+
+src/GLBridge.o: src/GLBridge.cpp.o
+.PHONY : src/GLBridge.o
+
+# target to build an object file
+src/GLBridge.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/GLBridge.cpp.o
+.PHONY : src/GLBridge.cpp.o
+
+src/GLBridge.i: src/GLBridge.cpp.i
+.PHONY : src/GLBridge.i
+
+# target to preprocess a source file
+src/GLBridge.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/GLBridge.cpp.i
+.PHONY : src/GLBridge.cpp.i
+
+src/GLBridge.s: src/GLBridge.cpp.s
+.PHONY : src/GLBridge.s
+
+# target to generate assembly for a file
+src/GLBridge.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/GLBridge.cpp.s
+.PHONY : src/GLBridge.cpp.s
+
+src/Sea.o: src/Sea.cpp.o
+.PHONY : src/Sea.o
+
+# target to build an object file
+src/Sea.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Sea.cpp.o
+.PHONY : src/Sea.cpp.o
+
+src/Sea.i: src/Sea.cpp.i
+.PHONY : src/Sea.i
+
+# target to preprocess a source file
+src/Sea.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Sea.cpp.i
+.PHONY : src/Sea.cpp.i
+
+src/Sea.s: src/Sea.cpp.s
+.PHONY : src/Sea.s
+
+# target to generate assembly for a file
+src/Sea.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mancurya.dir/build.make CMakeFiles/mancurya.dir/src/Sea.cpp.s
+.PHONY : src/Sea.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -165,6 +261,18 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/Environment.o"
+	@echo "... src/Environment.i"
+	@echo "... src/Environment.s"
+	@echo "... src/FleetManager.o"
+	@echo "... src/FleetManager.i"
+	@echo "... src/FleetManager.s"
+	@echo "... src/GLBridge.o"
+	@echo "... src/GLBridge.i"
+	@echo "... src/GLBridge.s"
+	@echo "... src/Sea.o"
+	@echo "... src/Sea.i"
+	@echo "... src/Sea.s"
 .PHONY : help
 
 
