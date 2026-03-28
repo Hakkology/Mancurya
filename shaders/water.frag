@@ -8,19 +8,16 @@ void main() {
     color.b += height * 2.0 + 0.1;
     color.g += height * 1.0;
     
-    // LINEAR YAKAMOZ (Ay Yolu - Moon Path)
-    // Ay merkeze (x=0) yakın olduğu için x ekseninde çizgisel bir aydınlanma
-    // abs(worldPos.x) arttıkça aydınlanma düşer (Moon Path etkisi)
-    float moonPath = exp(-abs(worldPos.x) * 2.5);
+    float moonPath = exp(-abs(worldPos.x) * 1.5); // Widened from 2.5
     
-    // Sadece dalga tepelerinde (height > 0) parıltı (Masterpiece Tuning)
-    float shimmer = pow(max(0.0, height * 15.0), 4.0);
+    // Increased shimmer intensity on wave peaks
+    float shimmer = pow(max(0.0, height * 20.0 + 0.1), 3.0); 
     
-    // Zaman bazlı pırıltı
-    float flicker = (sin(time * 1.0 + worldPos.z * 3.0) * 0.5 + 0.5);
+    // Smooth flicker for water sparkle
+    float flicker = (sin(time * 1.5 + worldPos.z * 4.0) * 0.5 + 0.5);
     
-    // Çizgisel yansıma (Soft Cyan/White)
-    color.rgb += vec3(0.5, 0.8, 1.0) * moonPath * shimmer * flicker * 0.7;
+    // Brilliant Cyan/White reflection
+    color.rgb += vec3(0.6, 0.9, 1.0) * moonPath * shimmer * flicker * 0.9;
     
     gl_FragColor = color;
 }

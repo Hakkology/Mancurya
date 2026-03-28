@@ -16,7 +16,8 @@ float storyTimer = 0.0f;
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity(); 
-    gluLookAt(0.0f, 0.8f, 5.0f, 0.0f, 0.2f, -5.0f, 0.0f, 1.0f, 0.0f);
+    // Stable viewing angle for better fleet and environment visibility
+    gluLookAt(0.0f, 1.2f, 7.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
     
     env.draw(storyTimer);
     sea.draw();

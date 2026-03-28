@@ -7,7 +7,7 @@
 namespace Mancurya {
 
 void FleetManager::init() {
-    projectileShader.load("../shaders/projectile.vert", "../shaders/projectile.frag");
+    projectileShader.load("shaders/projectile.vert", "shaders/projectile.frag");
     for (int i=0; i<8; i++) {
         float z = -1.5f + i*0.45f + (rand()%100/400.0f - 0.12f);
         mancurian.push_back({-1.6f + (rand()%100/500.0f), -0.38f, z, -1.6f, false, true});
