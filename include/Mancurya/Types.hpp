@@ -8,7 +8,7 @@ namespace Mancurya {
     const float GRAVITY = -0.003f;
 
     struct Ship {
-        float x, y, z, baseX;
+        float x, y, z, baseX, scale = 1.0f;
         bool isBurning = false, isShooting = true;
     };
 
