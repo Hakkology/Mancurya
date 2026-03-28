@@ -1,4 +1,4 @@
-#include <Mancurya/GLBridge.hpp>
+#include <GL/glew.h>
 #include <Mancurya/Environment.hpp>
 #include <Mancurya/Sea.hpp>
 #include <Mancurya/FleetManager.hpp>
@@ -56,7 +56,7 @@ void fire(int v) {
 }
 
 void init() {
-    GLBridge::init();
+    glewInit();
     env.init(); 
     sea.init(); 
     fleets.init();

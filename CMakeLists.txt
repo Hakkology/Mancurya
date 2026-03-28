@@ -7,15 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLU REQUIRED)
+find_package(GLEW REQUIRED)
 
-include_directories(include)
+include_directories(include ${GLEW_INCLUDE_DIRS})
 
 add_executable(mancurya 
     main.cpp
-    src/GLBridge.cpp
     src/Environment.cpp
     src/Sea.cpp
     src/FleetManager.cpp
 )
 
-target_link_libraries(mancurya PRIVATE ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLU_LIBRARIES} -lX11)
+target_link_libraries(mancurya PRIVATE ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLU_LIBRARIES} ${GLEW_LIBRARIES} -lX11)
